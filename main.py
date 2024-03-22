@@ -3,12 +3,12 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 import pathlib
-
+from utils.startup import startup_send_webhook
 load_dotenv()
 
 TOKEN = os.getenv('BOT_TOKEN')
 command_prefix = ['y/']
-
+main_guild_id = 825804625093328896
 class MyBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,6 +30,7 @@ class MyBot(commands.Bot):
             print('------')
             print('All cogs have been loaded and bot is ready.')
             print('------')
+            await startup_send_webhook(bot, guild_id=main_guild_id)
         else:
             print('Bot is already initialized.')
 
