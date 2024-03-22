@@ -10,17 +10,14 @@ class Setup(commands.Cog):
 
     def save_config(self, guild_id, channel_id):
         """通報チャンネルの設定を保存する"""
-        # config.jsonファイルが存在すれば読み込み、そうでなければ空の辞書を使用
         if os.path.exists(self.config_path):
             with open(self.config_path, 'r') as f:
                 config = json.load(f)
         else:
             config = {}
 
-        # ギルドIDに対応する設定を更新または作成
         config[str(guild_id)] = {"report_channel": channel_id}
 
-        # 変更をconfig.jsonファイルに書き込み
         with open(self.config_path, 'w') as f:
             json.dump(config, f, indent=4)
 

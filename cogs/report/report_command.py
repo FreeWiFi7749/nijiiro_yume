@@ -15,14 +15,12 @@ class ReportCommand(commands.Cog):
         if os.path.exists(self.config_path):
             with open(self.config_path, 'r') as f:
                 config = json.load(f)
-            # 新しいフォーマットに対応
             guild_config = config.get(str(guild_id))
             if guild_config:
                 return guild_config.get("report_channel")
         return None
 
     async def send_reports(self, ctx, reason):
-        # コマンド実行時にギルドIDを取得し、適切な通報チャンネルIDをロード
         self.report_channel_id = self.load_report_channel_id(ctx.guild.id)
         if not self.report_channel_id:
             await ctx.send("通報チャンネルが設定されていません。", ephemeral=True)
@@ -43,7 +41,7 @@ class ReportCommand(commands.Cog):
             e.add_field(name="通報されたユーザー", value=f"<@{report['author_id']}>")
             e.add_field(name="通報したユーザー", value=f"<@{report['reporter_id']}>")
             e.add_field(name="理由", value=reason)
-            report_channel = self.bot.get_channel(int(self.report_channel_id))  # IDをint型に変換
+            report_channel = self.bot.get_channel(int(self.report_channel_id))
             if report_channel:
                 await report_channel.send(embed=e)
 
