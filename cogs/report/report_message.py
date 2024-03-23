@@ -73,7 +73,7 @@ class ReportMessageCog(commands.Cog):
 
 async def setup(bot):
     cog = ReportMessageCog(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)
 
     async def report_message(interaction: discord.Interaction, message: discord.Message):
         mod_channel_id = 1220578233875959918

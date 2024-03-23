@@ -48,7 +48,7 @@ class ReportUserCog(commands.Cog):
 
 async def setup(bot):
     cog = ReportUserCog(bot)
-    bot.add_cog(cog)
+    await bot.add_cog(cog)
 
     async def report_user(interaction: discord.Interaction, user: discord.User):
         role_name = "Staff"
