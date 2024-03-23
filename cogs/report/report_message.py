@@ -22,14 +22,16 @@ class OtherReasonModal(Modal):
         mod_role = discord.utils.get(self.guild.roles, name="Staff")
         embed = discord.Embed(
             title="メッセージ通報",
-            description=f"{interaction.user.mention} が {self.message.jump_url} ({self.message.author.mention}) を **その他の理由** で通報しました。\n通報理由: {self.reason.value}\n直ちに事実確認を行い適切な対応をしてください。",
+            description=f"{interaction.user.mention} が {self.message.jump_url} ({self.message.author.mention}) を **その他の理由** で通報しました。\n直ちに事実確認を行い適切な対応をしてください。",
             color=0xFF0000,
             timestamp=datetime.now().astimezone(pytz.timezone('Asia/Tokyo'))
         )
+        embed.add_field(name="通報理由", value=self.reason.value, inline=False)
         embed.add_field(name="通報されたメッセージ", value=f"{self.message.content}\n\n`{self.message.content}`", inline=False)
         embed.set_author(name=f"通報者：{interaction.user.display_name} | {interaction.user.id}\n通報されたユーザー：{self.message.author.display_name} | {self.message.author.id}")
         await self.mod_channel.send(embed=embed, content=f"{mod_role.mention}")
         await interaction.followup.send("メッセージが運営に通報されました。", ephemeral=True)
+        self.stop()
 
 class ReportReasonView(discord.ui.View):
     def __init__(self, message: discord.Message, mod_channel: discord.TextChannel):
@@ -94,9 +96,10 @@ async def setup(bot):
         if view.value is None:
             await interaction.followup.send("通報がキャンセルされました。", ephemeral=True)
             return
-                
+
+        if view.value == "その他":
+            return      
             
-        # Embed生成部分
         jst = pytz.timezone('Asia/Tokyo')
         now = datetime.now(jst)
         embed = discord.Embed(

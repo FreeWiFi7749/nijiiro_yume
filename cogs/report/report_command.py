@@ -49,6 +49,7 @@ class ReportCommand(commands.Cog):
 
     @commands.hybrid_command(name="report")
     async def report_command(self, ctx, *, reason: str):
+        """通報を完了する"""
         await self.send_reports(ctx, reason)
 
 async def setup(bot):
