@@ -1,3 +1,4 @@
+
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -8,7 +9,7 @@ class ReportDmMessage(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.base_report_path = "/data/report/dm_message"
-
+"""
     @app_commands.install_types(guild=False, users=True)
     @app_commands.allow_context(guild=False, dms=True, private_channels=True)
     @app_commands.user_command(name="通報", description="DMのメッセージをサーバー運営に通報します。")
@@ -33,7 +34,7 @@ class ReportDmMessage(commands.Cog):
         
         with open(report_file, 'w') as f:
             json.dump(report_data, f, indent=4)
-
+"""
 
 async def setup(bot):
     await bot.add_cog(ReportDmMessage(bot))

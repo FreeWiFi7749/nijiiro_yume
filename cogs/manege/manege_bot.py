@@ -18,7 +18,7 @@ class ManagementBot(commands.Cog):
                 print("このOSはサポートされていません。")
                 return
             await self.bot.close()
-        except subprocess.SubprocessError as e:
+        except Exception as e:
             print(f"再起動中にエラーが発生しました: {e}")
 
 
@@ -40,6 +40,7 @@ class ManagementBot(commands.Cog):
     async def shutdown(self, ctx):
         """Botをシャットダウンする"""
         await ctx.send('Botをシャットダウンします...')
+        await self.bot.close()
 
     @commands.hybrid_command(name='help', with_app_command=True)
     async def list_commands(self, ctx):

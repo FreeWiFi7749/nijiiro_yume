@@ -34,7 +34,7 @@ class MyBot(commands.Bot):
             print('------')
             print('All cogs have been loaded and bot is ready.')
             print('------')
-            await startup_send_webhook(bot, guild_id=main_guild_id, startup_channel_id=startup_channel_id)
+            await startup_send_webhook(bot, guild_id=main_guild_id)
             await startup_send_botinfo(bot)
         else:
             print('Bot is already initialized.')
