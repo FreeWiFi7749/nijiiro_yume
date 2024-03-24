@@ -3,12 +3,14 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 import pathlib
-from utils.startup import startup_send_webhook
+from utils.startup import startup_send_webhook, startup_send_botinfo
 load_dotenv()
 
 TOKEN = os.getenv('BOT_TOKEN')
 command_prefix = ['y/']
 main_guild_id = 825804625093328896
+startup_channel_id = 1220428119299719229
+
 class MyBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,13 +26,16 @@ class MyBot(commands.Bot):
             print('------')
             await self.load_cogs()
             await self.load_report_cogs()
+            await self.load_manege_cogs()
+            await self.load_tool_cogs()
             await bot.tree.sync()
             await self.change_presence(activity=discord.Game(name="ドリームは変態"))
             self.initialized = True
             print('------')
             print('All cogs have been loaded and bot is ready.')
             print('------')
-            await startup_send_webhook(bot, guild_id=main_guild_id)
+            await startup_send_webhook(bot, guild_id=main_guild_id, startup_channel_id=startup_channel_id)
+            await startup_send_botinfo(bot)
         else:
             print('Bot is already initialized.')
 
@@ -44,6 +49,7 @@ class MyBot(commands.Bot):
                 print(f'{cog_name} loaded successfully.')
             except commands.ExtensionFailed as e:
                 print(f'Failed to load extension {p.stem}: {e}')
+                return 
 
     async def load_report_cogs(self):
         folder_name = 'cogs/report'
@@ -51,6 +57,28 @@ class MyBot(commands.Bot):
         for p in cur.glob(f"{folder_name}/*.py"):
             try:
                 cog_name = f'cogs.report.{p.stem}'
+                await self.load_extension(cog_name)
+                print(f'{cog_name} loaded successfully.')
+            except commands.ExtensionFailed as e:
+                print(f'Failed to load extension {p.stem}: {e}')
+
+    async def load_manege_cogs(self):
+        folder_name = 'cogs/manege'
+        cur = pathlib.Path('.')
+        for p in cur.glob(f"{folder_name}/*.py"):
+            try:
+                cog_name = f'cogs.manege.{p.stem}'
+                await self.load_extension(cog_name)
+                print(f'{cog_name} loaded successfully.')
+            except commands.ExtensionFailed as e:
+                print(f'Failed to load extension {p.stem}: {e}')
+
+    async def load_tool_cogs(self):
+        folder_name = 'cogs/tool'
+        cur = pathlib.Path('.')
+        for p in cur.glob(f"{folder_name}/*.py"):
+            try:
+                cog_name = f'cogs.tool.{p.stem}'
                 await self.load_extension(cog_name)
                 print(f'{cog_name} loaded successfully.')
             except commands.ExtensionFailed as e:

@@ -12,7 +12,7 @@ class ManagementBot(commands.Cog):
     async def rstart_bot(self):
         try:
             if platform.system() == "Linux":
-                subprocess.Popen(["/bin/sh", "-c", "sleep 1; exec python3 " + " ".join(sys.argv)])
+                subprocess.Popen(["sudo", "systemctl", "restart", "nijiiro_yume.service"])
             elif platform.system() == "Darwin":
                 subprocess.Popen(["/bin/sh", "-c", "sleep 1; exec python3 " + " ".join(sys.argv)])
             else:
