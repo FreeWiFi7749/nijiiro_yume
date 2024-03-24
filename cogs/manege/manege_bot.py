@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import os
 import sys
 import subprocess
 import platform
@@ -19,7 +18,7 @@ class ManagementBot(commands.Cog):
                 print("このOSはサポートされていません。")
                 return
             await self.bot.close()
-        except Exception as e:
+        except subprocess.SubprocessError as e:
             print(f"再起動中にエラーが発生しました: {e}")
 
 
@@ -32,7 +31,7 @@ class ManagementBot(commands.Cog):
             await asyncio.sleep(1)
             await msg.edit(content=f"{i}秒後にBotを再起動します")
             if i == 1:
-                await msg.edit(content=f"Botの再起動を開始します...")
+                await msg.edit(content="Botの再起動を開始します...")
                 
         await self.rstart_bot()
     

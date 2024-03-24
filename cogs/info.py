@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from datetime import datetime
 
 class ServerInfoCog(commands.Cog, name='Server Information'):
     def __init__(self, bot):

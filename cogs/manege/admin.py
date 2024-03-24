@@ -4,7 +4,7 @@ import io
 import textwrap
 from contextlib import redirect_stdout
 import traceback
-from discord.ext.commands import Context
+import subprocess
 
 class AdminCog(commands.Cog):
     def __init__(self, bot):
@@ -41,14 +41,14 @@ class AdminCog(commands.Cog):
 
         try:
             exec(to_compile, env)
-        except Exception as e:
+        except SyntaxError as e:
             return await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
 
         func = env['func']
         try:
             with redirect_stdout(stdout):
                 ret = await func()
-        except Exception as e:
+        except subprocess.SubprocessError:
             value = stdout.getvalue()
             await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
         else:

@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import os
 import platform
 import psutil
 import datetime
@@ -14,7 +13,7 @@ def create_usage_bar(usage, length=20):
 
 def get_service_uptime(service_name):
     try:
-        result = subprocess.run(["systemctl", "show", "-p", "ActiveEnterTimestamp", service_name], capture_output=True, text=True)
+        result = subprocess.run(["systemctl", "show", "-p", "ActiveEnterTimestamp", service_name], capture_output=True, text=True, check=True)
         output = result.stdout.strip()
 
         start_time_str = output.split("=")[-1].strip()
@@ -24,7 +23,7 @@ def get_service_uptime(service_name):
         uptime = now - start_time
 
         return str(uptime).split('.')[0]
-    except Exception as e:
+    except subprocess.SubprocessError:
         return "情報を取得できませんでした。"
     
 class BotInfoCog(commands.Cog):
@@ -49,7 +48,7 @@ class BotInfoCog(commands.Cog):
         memory_bar = create_usage_bar(memory_usage)
 
         embed = discord.Embed(title="BOT情報", color=0x00ff00)
-        embed.add_field(name="BOT", value=f"開発者: <@707320830387814531>\n所有権: Rainbow Server：雑談・通話・ゲーム総合Discord", inline=False)
+        embed.add_field(name="BOT", value="開発者: <@707320830387814531>\n所有権: Rainbow Server：雑談・通話・ゲーム総合Discord", inline=False)
         embed.add_field(name="OS", value=os_info, inline=False)
         embed.add_field(name="CPU", value=cpu_info, inline=False)
         embed.add_field(name="CPU コア", value=cpu_cores, inline=False)

@@ -5,9 +5,8 @@ import pytz
 import platform
 import psutil
 from utils.startup_create import create_usage_bar
-import os
-import pathlib
 from pathlib import Path
+import subprocess
 
 startup_channel_id = 1220428119299719229
 startup_guild_id = 825804625093328896
@@ -22,12 +21,12 @@ async def load_cogs(bot, directory='./cogs'):
             await bot.load_extension(cog_path)
         except commands.ExtensionAlreadyLoaded:
             continue
-        except Exception as e:
+        except subprocess.SubprocessError as e:
             failed_cogs[cog_path] = str(e)
 
     return failed_cogs
 
-async def startup_send_webhook(bot, guild_id, startup_channel_id):
+async def startup_send_webhook(bot, guild_id):
     guild = bot.get_guild(guild_id)
     if guild is None:
         print("ギルドが見つかりません。")
@@ -84,7 +83,7 @@ async def startup_send_botinfo(bot):
     memory_bar = create_usage_bar(memory_usage)
 
     embed = discord.Embed(title="BOT情報", color=0x00ff00)
-    embed.add_field(name="BOT", value=f"開発者: Rainbow Server開発チーム\n所有権: Rainbow Server：雑談・通話・ゲーム総合Discord", inline=False)
+    embed.add_field(name="BOT", value="開発者: Rainbow Server開発チーム\n所有権: Rainbow Server：雑談・通話・ゲーム総合Discord", inline=False)
     embed.add_field(name="開発言語", value=f"discord.py {discord_py_version}", inline=False)
     embed.add_field(name="OS", value=os_info, inline=False)
     embed.add_field(name="CPU", value=cpu_info, inline=False)

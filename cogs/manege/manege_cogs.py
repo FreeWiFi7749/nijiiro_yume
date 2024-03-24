@@ -1,6 +1,6 @@
 from discord.ext import commands
-from discord import app_commands
 import discord
+import subprocess
 
 class ManagementCog(commands.Cog):
     def __init__(self, bot):
@@ -15,7 +15,7 @@ class ManagementCog(commands.Cog):
             await self.bot.tree.sync()
             await ctx.reply(f"{cog}を再読み込みしました")
             return
-        except Exception as e:
+        except subprocess.SubprocessError as e:
             await ctx.reply(f"{cog}を再読み込みを完了できませんでした...\n{type(e).__name__}: {e}")
             return
 
