@@ -29,7 +29,7 @@ class MyBot(commands.Bot):
             await self.load_manege_cogs()
             await self.load_tool_cogs()
             await bot.tree.sync()
-            await self.change_presence(activity=discord.Game(name="ドリームは変態"))
+            await self.change_presence(activity=discord.Game(name="バルーンも変態"))
             self.initialized = True
             print('------')
             print('All cogs have been loaded and bot is ready.')

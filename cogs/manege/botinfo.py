@@ -23,7 +23,7 @@ def get_service_uptime(service_name):
         uptime = now - start_time
 
         return str(uptime).split('.')[0]
-    except subprocess.SubprocessError:
+    except Exception as e:
         return "情報を取得できませんでした。"
     
 class BotInfoCog(commands.Cog):
