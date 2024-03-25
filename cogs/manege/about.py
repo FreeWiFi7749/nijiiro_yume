@@ -34,7 +34,8 @@ class BotInfoCog(commands.Cog):
 
     @commands.hybrid_command()
     async def about(self, ctx):
-        """Botに関する情報を表示します"""
+        """BOTの情報を表示します"""
+
         
 
         os_info = f"{platform.system()} {platform.release()} ({platform.version()})"
@@ -70,7 +71,6 @@ class BotInfoCog(commands.Cog):
         embed.add_field(name="メモリ使用率", value=f"{memory_bar} / {total_memory_gb}GB", inline=False)
 
         await ctx.send(embed=embed)
-
 
 async def setup(bot):
     await bot.add_cog(BotInfoCog(bot))

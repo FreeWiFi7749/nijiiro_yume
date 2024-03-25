@@ -40,7 +40,7 @@ class JoinLeaveLoggingCog(commands.Cog):
 
         embed = discord.Embed(description=f"<@!{member.id}>が参加しました。", color=discord.Color.green(), timestamp=now)
         embed.set_author(name=member.display_name, icon_url=member.avatar.url)
-        embed.add_field(name="アカウント年齢", value=f"<t:{account_age_seconds}:R>\n<t:{account_age_seconds}:d>", inline=True)
+        embed.add_field(name="アカウント年齢", value=f"<t:{account_age_seconds}:d>\n<t:{account_age_seconds}:R>", inline=True)
         embed.set_footer(text=member.guild.name)
 
         await log_channel.send(embed=embed)

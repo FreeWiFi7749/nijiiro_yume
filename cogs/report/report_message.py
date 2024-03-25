@@ -27,7 +27,8 @@ class OtherReasonModal(Modal):
             timestamp=datetime.now().astimezone(pytz.timezone('Asia/Tokyo'))
         )
         embed.add_field(name="通報理由", value=self.reason.value, inline=False)
-        embed.add_field(name="通報されたメッセージ", value=f"{self.message.content}\n\n↓正規表現↓\n`{self.message.content}`", inline=False)
+        embed.add_field(name="通報されたメッセージ", value={self.message.content}, inline=False)
+        embed.add_field(name="正規表現", value=f"`{self.message.content}`", inline=False)
         embed.set_author(name=f"通報者：{interaction.user.display_name} | {interaction.user.id}\n通報されたユーザー：{self.message.author.display_name} | {self.message.author.id}")
         await self.mod_channel.send(embed=embed, content=f"{mod_role.mention}")
         await interaction.followup.send("メッセージが運営に通報されました。", ephemeral=True)
@@ -112,7 +113,8 @@ async def setup(bot):
 
         embed.add_field(name="通報理由", value=view.value, inline=False)
 
-        embed.add_field(name="通報されたメッセージ", value=f"{message.content}\n\n↓正規表現↓\n`{message.content}`", inline=False)
+        embed.add_field(name="通報されたメッセージ", value={message.content}, inline=False)
+        embed.add_field(name="正規表現", value=f"`{message.content}`", inline=False)
         if message.attachments:
             embed.add_field(name="添付ファイル", value="\n".join([attachment.url for attachment in message.attachments]), inline=False)
             if message.attachments[0].content_type.startswith("image"):

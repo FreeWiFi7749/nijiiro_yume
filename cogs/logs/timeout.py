@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
-import json
 import os
-from datetime import datetime, timedelta, timezone
+import json
+import datetime
 
-class TimeoutLoggingCog(commands.Cog):
+class TimeoutLogging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -20,34 +20,54 @@ class TimeoutLoggingCog(commands.Cog):
         with open(config_path, 'r') as f:
             return json.load(f)
 
+    def save_config(self, guild_id, config):
+        with open(self.get_config_path(guild_id), 'w') as f:
+            json.dump(config, f, indent=4)
+
+    async def _log_role_change(self, guild_id, embed):
+        config = self.load_config(guild_id)
+        if not config.get("log_timeout", True):
+            print("Role logging is disabled.")
+            return
+
+        log_channel_id = config.get("log_channel")
+        if log_channel_id:
+            log_channel = self.bot.get_channel(log_channel_id)
+            if log_channel:
+                await log_channel.send(embed=embed)
+    
     @commands.Cog.listener()
-    async def on_member_update(self, before, after):
-        if before.communication_disabled_until != after.communication_disabled_until:
-            config = self.load_config(after.guild.id)
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        if before.timed_out_until != after.timed_out_until:
+            guild_id = before.guild.id
+            config = self.load_config(guild_id)
             if not config.get("log_timeout"):
                 return
-            
+
             log_channel_id = config.get("log_channel")
-            log_channel = self.bot.get_channel(log_channel_id)
-            if log_channel is None:
+            if not log_channel_id:
                 return
 
-            JST = timezone(timedelta(hours=+9))
-            now = datetime.now(JST)
-            
-            if after.communication_disabled_until:
-                embed = discord.Embed(title="ユーザータイムアウト設定ログ", color=discord.Color.orange(), timestamp=now)
-                embed.set_author(name=after.display_name, icon_url=after.avatar.url)
-                embed.add_field(name="ユーザー名", value=after.display_name + "\n" + after.mention, inline=True)
-                embed.add_field(name="ユーザーID", value=str(after.id), inline=True)
-                embed.add_field(name="タイムアウト終了時刻", value=after.communication_disabled_until.strftime('%Y/%m/%d %H:%M:%S JST'), inline=True)
-            else:
-                embed = discord.Embed(title="ユーザータイムアウト解除ログ", color=discord.Color.green(), timestamp=now)
-                embed.set_author(name=after.display_name, icon_url=after.avatar.url)
-                embed.add_field(name="ユーザー名", value=after.display_name + "\n" + after.mention, inline=True)
-                embed.add_field(name="ユーザーID", value=str(after.id), inline=True)
+            log_channel = self.bot.get_channel(log_channel_id)
+            if not log_channel:
+                return
 
-            await log_channel.send(embed=embed)
+            if after.timed_out_until is None:
+                
+                timeout_time = after.timed_out_until.timestamp()
+                timeout_time_stamp = "<t:{}>:<t:{}>".format(int(timeout_time), int(timeout_time))
+
+                embed = discord.Embed(title=f"{after.display_name} がタイムアウトしました", color=discord.Color.red())
+                embed.set_thumbnail(url=after.avatar.url)
+                embed.set_author(name=after.display_name, icon_url=after.avatar.url)
+                embed.add_field(name="タイムアウト期限", value=after.timeout_time_stamp, inline=False)
+                embed.set_footer(text=before.guild.name, icon_url=before.guild.icon.url)
+
+            if after.timed_out_until is not None:
+                embed = discord.Embed(title=f"{after.display_name} のタイムアウトが解除されました", color=discord.Color.green())
+                embed.set_thumbnail(url=after.avatar.url)
+                embed.set_author(name=after.display_name, icon_url=after.avatar.url)
+                embed.set_footer(text=before.guild.name, icon_url=before.guild.icon.url)
 
 async def setup(bot):
-    await bot.add_cog(TimeoutLoggingCog(bot))
+    await bot.add_cog(TimeoutLogging(bot))

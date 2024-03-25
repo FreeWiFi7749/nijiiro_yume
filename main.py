@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 import pathlib
 import uuid
-
 from utils import presence
 from utils.startup import startup_send_webhook, startup_send_botinfo
 
@@ -45,11 +44,7 @@ class MyBot(commands.Bot):
             print(f'Bot Username: {self.user.name}')
             print(f'BotID: {self.user.id}')
             print('------')
-            await self.load_cogs()
-            await self.load_report_cogs()
-            await self.load_manege_cogs()
-            await self.load_tool_cogs()
-            await self.load_logs_cogs()
+            await self.load_cogs('cogs')
             await bot.tree.sync()
             self.loop.create_task(presence.update_presence(self))
             self.initialized = True
@@ -61,59 +56,15 @@ class MyBot(commands.Bot):
         else:
             print('Bot is already initialized.')
 
-    async def load_cogs(self):
-        folder_name = 'cogs'
+    async def load_cogs(self, folder_name: str):
         cur = pathlib.Path('.')
-        for p in cur.glob(f"{folder_name}/*.py"):
+        for p in cur.glob(f"{folder_name}/**/*.py"):
+            if p.stem == "__init__":
+                continue
             try:
-                cog_name = f'cogs.{p.stem}'
-                await self.load_extension(cog_name)
-                print(f'{cog_name} loaded successfully.')
-            except commands.ExtensionFailed as e:
-                print(f'Failed to load extension {p.stem}: {e}')
-                return 
-
-    async def load_report_cogs(self):
-        folder_name = 'cogs/report'
-        cur = pathlib.Path('.')
-        for p in cur.glob(f"{folder_name}/*.py"):
-            try:
-                cog_name = f'cogs.report.{p.stem}'
-                await self.load_extension(cog_name)
-                print(f'{cog_name} loaded successfully.')
-            except commands.ExtensionFailed as e:
-                print(f'Failed to load extension {p.stem}: {e}')
-
-    async def load_manege_cogs(self):
-        folder_name = 'cogs/manege'
-        cur = pathlib.Path('.')
-        for p in cur.glob(f"{folder_name}/*.py"):
-            try:
-                cog_name = f'cogs.manege.{p.stem}'
-                await self.load_extension(cog_name)
-                print(f'{cog_name} loaded successfully.')
-            except commands.ExtensionFailed as e:
-                print(f'Failed to load extension {p.stem}: {e}')
-
-    async def load_tool_cogs(self):
-        folder_name = 'cogs/tool'
-        cur = pathlib.Path('.')
-        for p in cur.glob(f"{folder_name}/*.py"):
-            try:
-                cog_name = f'cogs.tool.{p.stem}'
-                await self.load_extension(cog_name)
-                print(f'{cog_name} loaded successfully.')
-            except commands.ExtensionFailed as e:
-                print(f'Failed to load extension {p.stem}: {e}')
-
-    async def load_logs_cogs(self):
-        folder_name = 'cogs/logs'
-        cur = pathlib.Path('.')
-        for p in cur.glob(f"{folder_name}/*.py"):
-            try:
-                cog_name = f'cogs.logs.{p.stem}'
-                await self.load_extension(cog_name)
-                print(f'{cog_name} loaded successfully.')
+                cog_path = p.relative_to(cur).with_suffix('').as_posix().replace('/', '.')
+                await self.load_extension(cog_path)
+                print(f'{cog_path} loaded successfully.')
             except commands.ExtensionFailed as e:
                 print(f'Failed to load extension {p.stem}: {e}')
 
@@ -130,7 +81,6 @@ class MyBot(commands.Bot):
                 embed.add_field(name="エラーメッセージ", value=str(error), inline=False)
                 await error_channel.send(embed=embed)
             
-
             embed_dm = discord.Embed(
                 title="エラー通知",
                 description=(
