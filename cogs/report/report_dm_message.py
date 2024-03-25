@@ -9,6 +9,7 @@ class ReportDmMessage(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.base_report_path = "/data/report/dm_message"
+        
 """
     @app_commands.install_types(guild=False, users=True)
     @app_commands.allow_context(guild=False, dms=True, private_channels=True)

@@ -45,10 +45,13 @@ class VoiceLoggingCog(commands.Cog):
 
         if before.channel is None and after.channel is not None:
             embed = discord.Embed(description=f"{member.mention}が`{after.channel.name}`に参加しました", color=discord.Color.green(), timestamp=now)
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1104493356781940766/1158216598142845018/IMG_1002_adobe_express.png")
         elif before.channel is not None and after.channel is None:
             embed = discord.Embed(description=f"{member.mention}が`{before.channel.name}`から退出しました", color=discord.Color.red(), timestamp=now)
+            embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1104493356781940766/1158216598553894982/IMG_1003_adobe_express.png")
         elif before.channel is not None and after.channel is not None and before.channel != after.channel:
             embed = discord.Embed(description=f"{member.mention}が`{before.channel.name}`から`{after.channel.name}`に移動しました", color=discord.Color.blue(), timestamp=now)
+            embed.set_thumbnail(url="https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/2195.png")
 
         if embed:
             embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)

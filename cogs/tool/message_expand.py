@@ -35,6 +35,7 @@ class ImagePaginatorView(View):
 
     @discord.ui.button(label="◀", style=discord.ButtonStyle.secondary, custom_id="left")
     async def left_button_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print("左ボタンが押されました")
         self.current_index = max(0, self.current_index - 1)
         self.embed.set_image(url=self.image_urls[self.current_index])
         self.update_buttons()
@@ -42,6 +43,7 @@ class ImagePaginatorView(View):
 
     @discord.ui.button(label="▶", style=discord.ButtonStyle.secondary, custom_id="right")
     async def right_button_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print("右ボタンが押されました")
         self.current_index = min(len(self.image_urls) - 1, self.current_index + 1)
         self.embed.set_image(url=self.image_urls[self.current_index])
         self.update_buttons()

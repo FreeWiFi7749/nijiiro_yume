@@ -25,7 +25,7 @@ async def resize_image_if_needed(image_bytes, max_file_size=8*1024*1024, resize_
 
     # 必要に応じてさらにリサイズ
     while size > max_file_size:
-        image = image.resize((int(image.width * resize_ratio), int(image.height * resize_ratio)), Image.ANTIALIAS)
+        image = image.resize((int(image.width * resize_ratio), int(image.height * resize_ratio)))
         with io.BytesIO() as output:
             image.save(output, format='JPEG', quality=85)  # 品質はさらに調整可能
             size = output.tell()
