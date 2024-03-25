@@ -44,21 +44,15 @@ class VoiceLoggingCog(commands.Cog):
         embed = None
 
         if before.channel is None and after.channel is not None:
-            embed = discord.Embed(title="ボイスチャンネル入室ログ", color=discord.Color.green(), timestamp=now)
-            embed.add_field(name="参加したチャンネル", value=f"{after.channel.name}\n{after.channel.mention}", inline=True)
+            embed = discord.Embed(description=f"{member.mention}が`{after.channel.name}`に参加しました", color=discord.Color.green(), timestamp=now)
         elif before.channel is not None and after.channel is None:
-            embed = discord.Embed(title="ボイスチャンネル退出ログ", color=discord.Color.red(), timestamp=now)
-            embed.add_field(name="退出したチャンネル", value=f"{before.channel.name}\n{before.channel.mention}", inline=True)
-        elif before.channel != after.channel:
-            embed = discord.Embed(title="ボイスチャンネル移動ログ", color=discord.Color.blue(), timestamp=now)
-            embed.add_field(name="移動前のチャンネル", value=f"{before.channel.name}\n{before.channel.mention}", inline=True)
-            embed.add_field(name="移動後のチャンネル", value=f"{after.channel.name}\n{after.channel.mention}", inline=True)
+            embed = discord.Embed(description=f"{member.mention}が`{before.channel.name}`から退出しました", color=discord.Color.red(), timestamp=now)
+        elif before.channel is not None and after.channel is not None and before.channel != after.channel:
+            embed = discord.Embed(description=f"{member.mention}が`{before.channel.name}`から`{after.channel.name}`に移動しました", color=discord.Color.blue(), timestamp=now)
 
         if embed:
-            embed.set_thumbnail(url=member.display_avatar.url)
             embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
             embed.set_footer(text=member.guild.name, icon_url=member.guild.icon.url)
-            embed.add_field(name="ユーザー", value=member.mention, inline=True)
 
             try:
                 await log_channel.send(embed=embed)

@@ -48,7 +48,7 @@ class MessageEditLoggingCog(commands.Cog):
         JST = timezone(timedelta(hours=+9), 'JST')
         now = datetime.now(JST)
 
-        embed = discord.Embed(title="メッセージ編集ログ", description=message_after.jump_url, color=discord.Color.orange(), timestamp=now)
+        embed = discord.Embed(title="メッセージ編集", description=message_after.jump_url, color=discord.Color.orange(), timestamp=now)
         embed.add_field(name="編集前", value=shorten_text(message_before.content), inline=False)
         embed.add_field(name="編集後", value=shorten_text(message_after.content), inline=False)
         embed.add_field(name="チャンネル", value=message_before.channel.mention, inline=False)

@@ -31,20 +31,23 @@ class KickLoggingCog(commands.Cog):
         if log_channel is None:
             return
 
+        JST = timezone(timedelta(hours=+9))
+        now = datetime.now(JST)
+
+        async for entry in member.guild.audit_logs(limit=1, action=discord.AuditLogAction.ban):
+            if entry.target.id == member.id:
+                return
+
         async for entry in member.guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
             if entry.target.id == member.id:
-                JST = timezone(timedelta(hours=+9))
-                now = datetime.now(JST)
+                if now - entry.created_at < timedelta(minutes=1):
+                    embed = discord.Embed(description=f"{member.mention}がキックされました", color=discord.Color.orange(), timestamp=now)
+                    embed.set_author(name=member.display_name, icon_url=member.avatar.url)
+                    embed.add_field(name="実行者", value=entry.user.mention, inline=True)
+                    embed.add_field(name="理由", value=entry.reason or "理由なし", inline=True)
                 
-                embed = discord.Embed(title="ユーザーキックログ", color=discord.Color.orange(), timestamp=now)
-                embed.set_author(name=member.display_name, icon_url=member.avatar.url)
-                embed.add_field(name="ユーザー名", value=member.display_name + "\n" + member.mention, inline=True)
-                embed.add_field(name="ユーザーID", value=str(member.id), inline=True)
-                embed.add_field(name="実行者", value=entry.user.mention, inline=True)
-                embed.add_field(name="理由", value=entry.reason or "理由なし", inline=True)
-                
-                await log_channel.send(embed=embed)
-                break
+                    await log_channel.send(embed=embed)
+                    break
 
 async def setup(bot):
     await bot.add_cog(KickLoggingCog(bot))

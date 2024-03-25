@@ -135,7 +135,7 @@ class MessageDeleteLoggingCog(commands.Cog):
                 break
 
         JST = timezone(timedelta(hours=+9), 'JST')
-        embed = discord.Embed(title="メッセージ消去ログ", color=discord.Color.red(), timestamp=datetime.now(JST))
+        embed = discord.Embed(title="メッセージ消去", color=discord.Color.red(), timestamp=datetime.now(JST))
         embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
         embed.add_field(name="メッセージ", value=message.content if message.content else "なし", inline=False)
         embed.add_field(name="チャンネル", value=message.channel.mention, inline=True)

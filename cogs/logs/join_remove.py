@@ -38,7 +38,7 @@ class JoinLeaveLoggingCog(commands.Cog):
         created_at = member.created_at.replace(tzinfo=timezone.utc).astimezone(JST)
         account_age_seconds = int(created_at.timestamp())
 
-        embed = discord.Embed(title=f"{member.mention}が参加しました。", color=discord.Color.green(), timestamp=now)
+        embed = discord.Embed(description=f"<@!{member.id}>が参加しました。", color=discord.Color.green(), timestamp=now)
         embed.set_author(name=member.display_name, icon_url=member.avatar.url)
         embed.add_field(name="アカウント年齢", value=f"<t:{account_age_seconds}:R>\n<t:{account_age_seconds}:d>", inline=True)
         embed.set_footer(text=member.guild.name)
@@ -61,7 +61,7 @@ class JoinLeaveLoggingCog(commands.Cog):
         JST = timezone(timedelta(hours=+9))
         now = datetime.now(JST)
 
-        embed = discord.Embed(title=f"{member.mention}が脱退しました", color=discord.Color.red(), timestamp=now)
+        embed = discord.Embed(description=f"<@!{member.id}>が脱退しました", color=discord.Color.red(), timestamp=now)
         embed.set_author(name=member.display_name, icon_url=member.avatar.url)
         embed.set_footer(text=member.guild.name)
 

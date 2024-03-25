@@ -44,11 +44,11 @@ class BanLoggingCog(commands.Cog):
             executor = "不明"
             reason = "不明"
 
-        embed = discord.Embed(title="ユーザーBANログ", description=f"{user}がBANされました。", color=discord.Color.red(), timestamp=now)
-        embed.add_field(name="ユーザー", value=f"{user.mention}\nID: {user.id}", inline=True)
+        embed = discord.Embed(title="ユーザーBAN", description=f"{user}がBANされました。", color=discord.Color.red(), timestamp=now)
         embed.add_field(name="実行者", value=executor.mention, inline=True)
         embed.add_field(name="理由", value=reason, inline=False)
         embed.set_thumbnail(url=user.avatar.url)
+        embed.set_footer(text=executor.name, icon_url=executor.avatar.url)
 
         await log_channel.send(embed=embed)
 
@@ -65,8 +65,7 @@ class BanLoggingCog(commands.Cog):
         if log_channel is None:
             return
 
-        embed = discord.Embed(title="ユーザーBAN解除ログ", description=f"{user}のBANが解除されました。", color=discord.Color.green(), timestamp=now)
-        embed.add_field(name="ユーザー", value=f"{user}\nID: {user.id}", inline=True)
+        embed = discord.Embed(title="ユーザーBAN解除", description=f"{user}のBANが解除されました。", color=discord.Color.green(), timestamp=now)
         embed.set_thumbnail(url=user.avatar.url)
 
         await log_channel.send(embed=embed)
