@@ -113,7 +113,7 @@ async def setup(bot):
 
         embed.add_field(name="通報理由", value=view.value, inline=False)
 
-        embed.add_field(name="通報されたメッセージ", value={message.content}, inline=False)
+        embed.add_field(name="通報されたメッセージ", value=message.content, inline=False)
         embed.add_field(name="正規表現", value=f"`{message.content}`", inline=False)
         if message.attachments:
             embed.add_field(name="添付ファイル", value="\n".join([attachment.url for attachment in message.attachments]), inline=False)

@@ -13,7 +13,85 @@ def to_emoji(c: int) -> str:
 
 #<--------------View-------------->
 
-class PollSelectMenu(Select):
+class PollSumSelectMenu(Select):
+    def __init__(self, polls, bot, ctx):
+        self.bot = bot
+        self.ctx = ctx
+        options = [
+            discord.SelectOption(label=poll["question"][:100], description=f"ID: {poll_id}", value=poll_id)
+            for poll_id, poll in polls.items()
+        ]
+        super().__init__(placeholder="集計したい投票を選択してください...", min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        poll_id = self.values[0]
+        guild_id = self.ctx.guild.id
+        user_dirs = Path(f'data/polls/{guild_id}').iterdir()
+
+        poll_path = None
+        poll_data = None
+
+        for user_dir in user_dirs:
+            if user_dir.is_dir():
+                active_polls_path = user_dir / 'active'
+                if active_polls_path.exists():
+                    potential_poll_file = active_polls_path / f'{poll_id}.json'
+                    if potential_poll_file.exists():
+                        poll_path = potential_poll_file
+                        break
+
+        if not poll_path.exists():
+            await interaction.response.send_message("指定された投票が見つかりません。", ephemeral=True)
+            return
+        
+        with poll_path.open('r', encoding='utf-8') as f:
+            poll_data = json.load(f)
+        await interaction.response.defer()
+        message_id = poll_data.get('message_id')
+        if not message_id:
+            await interaction.response.send_message("メッセージIDが見つかりません。", ephemeral=True)
+            return
+
+        try:
+            message = await self.ctx.channel.fetch_message(message_id)
+        except discord.NotFound:
+            await interaction.response.send_message("投票メッセージが見つかりません。", ephemeral=True)
+            return
+        
+        results = {}
+        for reaction in message.reactions:
+
+            emoji = str(reaction.emoji)
+            results[emoji] = reaction.count - 1
+
+        sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
+        max_length = 10
+
+        result_text = ""
+        total_votes = sum(results.values())
+        for emoji, count in sorted_results:
+            percentage = (count / total_votes) * 100 if total_votes else 0
+            bar_length = int((percentage / 100) * max_length)
+            bar = '█' * bar_length
+            trophy = ' 🏆' if count == sorted_results[0][1] else ''
+            result_text += f"{emoji}: {count}票 ({percentage:.1f}%) {bar}{trophy}\n"
+    
+        embed = discord.Embed(
+            title=poll_data['question'],
+            description=result_text,
+            color=0x00ff00
+        )
+        message_link = f"https://discord.com/channels/{self.ctx.guild.id}/{self.ctx.channel.id}/{message_id}"
+        embed.add_field(name="投票を見る", value=f"[メッセージへ]({message_link})", inline=False)
+
+        await interaction.followup.send(embed=embed)
+
+class PollSumView(View):
+    def __init__(self, polls, bot, ctx):
+        super().__init__()
+        self.add_item(PollSumSelectMenu(polls, bot, ctx))
+
+class PollEndSelectMenu(Select):
     def __init__(self, polls, bot, ctx):
         self.bot = bot
         self.ctx = ctx
@@ -63,12 +141,12 @@ class PollSelectMenu(Select):
         archive_path.parent.mkdir(parents=True, exist_ok=True)
         poll_path.rename(archive_path)
         
-        await interaction.channel.send("投票が終了しました。")
+        await interaction.channel.send("投票が終了しました。", ephemeral=True)
 
 class PollEndView(View):
     def __init__(self, polls, bot, ctx):
         super().__init__()
-        self.add_item(PollSelectMenu(polls, bot, ctx))
+        self.add_item(PollEndSelectMenu(polls, bot, ctx))
 
 #<--------------Cog-------------->
         
@@ -95,6 +173,7 @@ class Polls(commands.Cog):
 
     @polls_group.command(name='poll', aliases=['po'])
     async def quickpoll(self, ctx: commands.Context, *, 質問と選択肢: str):
+        """複数投票可能な投票を作成します。"""
         args = re.split(r'[ 　]+', 質問と選択肢)
 
         if len(args) < 3:
@@ -104,7 +183,7 @@ class Polls(commands.Cog):
         choices = args[1:]
     
         if len(choices) > 20:
-            return await ctx.send('選択肢は最大20個までです。')
+            return await ctx.send('選択肢は最大20個までです。',)
 
         poll_id = str(uuid.uuid4())
 
@@ -114,12 +193,15 @@ class Polls(commands.Cog):
             "author": ctx.author.id,
         }
 
-        embed = discord.Embed(title=question, color=0x00ff00)
-        for index, choice in enumerate(choices, start=1):
-            emoji = f'{index}\N{COMBINING ENCLOSING KEYCAP}'
-            embed.add_field(name=f"選択肢{index}", value=choice, inline=False)
-            embed.set_footer(text="/polls end で終了")
-    
+        choices_description = "\n".join([f"{index}\N{COMBINING ENCLOSING KEYCAP} {choice}" for index, choice in enumerate(choices, start=1)])
+
+        embed = discord.Embed(
+            title=question,
+            description=f"{choices_description}\n🗳️</polls sum:1221715714579103804>で集計",
+            color=0x00ff00
+        )        
+        embed.set_footer(text="/polls end で終了")
+        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url)
         poll_message = await ctx.send(embed=embed)
     
         for index in range(len(choices)):
@@ -130,6 +212,7 @@ class Polls(commands.Cog):
 
     @polls_group.command(name='expoll', aliases=['exclusivepoll'])
     async def exclusive_poll(self, ctx: commands.Context, *, 質問と選択肢: str):
+        """一つの選択肢しか選べない投票を作成します。"""
         args = re.split(r'[ 　]+', 質問と選択肢)
 
         if len(args) < 3:
@@ -150,12 +233,15 @@ class Polls(commands.Cog):
             "exclusive": True
         }
 
-        embed = discord.Embed(title=question, color=0x00ff00)
-        for index, choice in enumerate(choices, start=1):
-            emoji = f'{index}\N{COMBINING ENCLOSING KEYCAP}'
-            embed.add_field(name=f"選択肢{index}", value=choice, inline=False)
-            embed.set_footer(text="この投票は複数回答不可です。\n/polls end で終了")
+        choices_description = "\n".join([f"{index}\N{COMBINING ENCLOSING KEYCAP} {choice}" for index, choice in enumerate(choices, start=1)])
 
+        embed = discord.Embed(
+            title=question,
+            description=f"{choices_description}\n🗳️</polls sum:1221715714579103804>で集計",
+            color=0x00ff00
+        )        
+        embed.set_footer(text="/polls end で終了")
+        embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url)
         poll_message = await ctx.send(embed=embed)
 
         for index in range(len(choices)):
@@ -164,9 +250,32 @@ class Polls(commands.Cog):
 
         await self.save_poll_data(ctx.guild.id, ctx.author.id, poll_id, poll_data, poll_message.id)
 
+    @polls_group.command(name="sum")
+    async def sum_poll(self, ctx: commands.Context):
+        """指定した投票の集計をします。"""
+        guild_id = ctx.guild.id
+        user_dirs = Path(f'data/polls/{guild_id}').iterdir()
+
+        polls = {}
+        for user_dir in user_dirs:
+            if user_dir.is_dir():
+                active_polls_path = user_dir / 'active'
+                if active_polls_path.exists():
+                    for poll_file in active_polls_path.glob('*.json'):
+                        with poll_file.open('r', encoding='utf-8') as f:
+                            poll = json.load(f)
+                            polls[poll_file.stem] = poll
+
+        if not polls:
+            await ctx.send("集計する投票が​ありません。", ephemeral=True)
+            return
+        
+        view = PollSumView(polls, self.bot, ctx)
+        await ctx.send("集計したい投票を選択してください：", view=view, ephemeral=True)
 
     @polls_group.command(name="end")
     async def end_poll(self, ctx: commands.Context):
+        """自分で作成した投票を終了します。"""
         guild_id = ctx.guild.id
         polls_path = Path(f'data/polls/{guild_id}/{ctx.author.id}/active')
         polls = {}
@@ -178,13 +287,13 @@ class Polls(commands.Cog):
                         polls[poll_file.stem] = json.load(f)
 
         if not polls:
-            await ctx.send("終了する投票がありません。")
+            await ctx.send("終了する投票がありません。", ephemeral=True)
             return
 
         view = PollEndView(polls, self.bot, ctx)
         await ctx.send("終了させたい投票を選択してください：", view=view, ephemeral=True)
 
-#<--------------Event Listener-------------->
+#<--------------Event Handlers-------------->
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
