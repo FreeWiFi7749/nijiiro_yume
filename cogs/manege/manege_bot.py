@@ -4,6 +4,9 @@ import sys
 import subprocess
 import platform
 import asyncio
+import time
+
+from utils import api
 
 class ManagementBot(commands.Cog):
     def __init__(self, bot):
@@ -42,29 +45,21 @@ class ManagementBot(commands.Cog):
         await ctx.send('Botをシャットダウンします...')
         await self.bot.close()
 
-    @commands.hybrid_command(name='help', with_app_command=True)
-    async def list_commands(self, ctx):
-        """利用可能なコマンドのリストを教えます"""
-        embed = discord.Embed(
-            title="コマンドリスト",
-            description="利用可能な全てのコマンド",
-            color=0xFF8FDF
-            )
-        
-        for command in self.bot.commands:
-            if not command.hidden:
-                embed.add_field(name=command.name, value=f"説明: {command.help}" or "説明: なし", inline=False)
-        
-        await ctx.send(embed=embed)
-
     @commands.hybrid_command(name='ping', hidden=True)
     async def ping(self, ctx):
         """BotのPingを表示します"""
+        start_time = time.monotonic()
+        api_ping = await api.measure_api_ping()
         e = discord.Embed(title="Pong!", color=0xFF8FDF)
-        e.add_field(name="API Ping", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
-        e.add_field(name="WebSocket Ping", value=f"{round(self.bot.ws.latency * 1000)}ms", inline=True)
-        e.add_field(name="Bot Ping", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
-        await ctx.send(embed=e)
+        e.add_field(name="API Ping", value=f"{round(api_ping)}ms" if api_ping else "測定失敗", inline=True)
+        e.add_field(name="WebSocket Ping", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
+        sent_message = await ctx.send(embed=e)
+        end_time = time.monotonic()
+
+        bot_ping = round((end_time - start_time) * 1000)
+
+        e.add_field(name="Bot Ping", value=f"{bot_ping}ms", inline=True)
+        await sent_message.edit(embed=e)
 
 async def setup(bot):
     await bot.add_cog(ManagementBot(bot))

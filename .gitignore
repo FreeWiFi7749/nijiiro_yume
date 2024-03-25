@@ -4,3 +4,5 @@ data/
 .vscode/
 */.DS_Store
 */.vscode/
+error_test.py
+error_test.cpython-310.pyc

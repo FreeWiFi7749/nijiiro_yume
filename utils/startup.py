@@ -79,6 +79,8 @@ async def startup_send_botinfo(bot):
     memory = psutil.virtual_memory()
     memory_usage = memory.percent
 
+    total_memory_gb = round(memory.total / (1024 ** 3), 2)
+    
     cpu_bar = create_usage_bar(cpu_usage)
     memory_bar = create_usage_bar(memory_usage)
 
@@ -89,7 +91,7 @@ async def startup_send_botinfo(bot):
     embed.add_field(name="CPU", value=cpu_info, inline=False)
     embed.add_field(name="CPU コア", value=cpu_cores, inline=False)
     embed.add_field(name="CPU 使用率", value=cpu_bar, inline=False)
-    embed.add_field(name="メモリ使用率", value=memory_bar, inline=False)
+    embed.add_field(name="メモリ使用率", value=f"{memory_bar} / {total_memory_gb}GB", inline=False)
 
     webhook = await channel.create_webhook(name="BOT情報")
     await webhook.send(embed=embed)
