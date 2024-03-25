@@ -38,11 +38,10 @@ class JoinLeaveLoggingCog(commands.Cog):
         created_at = member.created_at.replace(tzinfo=timezone.utc).astimezone(JST)
         account_age_seconds = int(created_at.timestamp())
 
-        embed = discord.Embed(title="ユーザー参加ログ", color=discord.Color.green(), timestamp=now)
+        embed = discord.Embed(title=f"{member.mention}が参加しました。", color=discord.Color.green(), timestamp=now)
         embed.set_author(name=member.display_name, icon_url=member.avatar.url)
-        embed.add_field(name="ユーザー名", value=member.display_name + "\n" + member.mention, inline=True)
-        embed.add_field(name="ユーザーID", value=str(member.id), inline=True)
-        embed.add_field(name="アカウント年齢", value=f"<t:{account_age_seconds}:R>", inline=True)
+        embed.add_field(name="アカウント年齢", value=f"<t:{account_age_seconds}:R>\n<t:{account_age_seconds}:d>", inline=True)
+        embed.set_footer(text=member.guild.name)
 
         await log_channel.send(embed=embed)
 
@@ -62,10 +61,9 @@ class JoinLeaveLoggingCog(commands.Cog):
         JST = timezone(timedelta(hours=+9))
         now = datetime.now(JST)
 
-        embed = discord.Embed(title="ユーザー退出ログ", color=discord.Color.red(), timestamp=now)
+        embed = discord.Embed(title=f"{member.mention}が脱退しました", color=discord.Color.red(), timestamp=now)
         embed.set_author(name=member.display_name, icon_url=member.avatar.url)
-        embed.add_field(name="ユーザー名", value=member.display_name + "\n" + member.mention, inline=True)
-        embed.add_field(name="ユーザーID", value=str(member.id), inline=True)
+        embed.set_footer(text=member.guild.name)
 
         await log_channel.send(embed=embed)
 
