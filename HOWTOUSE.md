@@ -40,7 +40,7 @@ cp .env.example .env
    mkdir data
    ```
 
-2. `data`ディレクトリの中に、必要なサブディレクトリを一度に作成します。
+2. `data`ディレクトリの中に、必要なサブディレクトリを以下のコマンドを使って作成します。
 
    ```bash
    mkdir -p data/auto_reaction data/logs data/polls data/report
