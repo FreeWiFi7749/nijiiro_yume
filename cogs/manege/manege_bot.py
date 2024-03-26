@@ -8,7 +8,7 @@ import time
 
 from utils import api
 
-class ManagementBot(commands.Cog):
+class ManagementBotCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     async def rstart_bot(self):
@@ -62,4 +62,4 @@ class ManagementBot(commands.Cog):
         await sent_message.edit(embed=e)
 
 async def setup(bot):
-    await bot.add_cog(ManagementBot(bot))
+    await bot.add_cog(ManagementBotCog(bot))

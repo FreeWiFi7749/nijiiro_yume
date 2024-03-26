@@ -150,7 +150,7 @@ class PollEndView(View):
 
 #<--------------Cog-------------->
         
-class Polls(commands.Cog):
+class PollsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -310,4 +310,4 @@ class Polls(commands.Cog):
                         await message.remove_reaction(reaction.emoji, user)
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(Polls(bot))
+    await bot.add_cog(PollsCog(bot))

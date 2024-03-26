@@ -3,7 +3,7 @@ from discord.ext import commands
 import json
 import os
 
-class Nickname(commands.Cog):
+class NicknameLoggingCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -57,4 +57,4 @@ class Nickname(commands.Cog):
                 pass
 
 async def setup(bot):
-    await bot.add_cog(Nickname(bot))
+    await bot.add_cog(NicknameLoggingCog(bot))

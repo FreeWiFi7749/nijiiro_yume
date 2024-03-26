@@ -3,7 +3,7 @@ from discord.ext import commands
 import json
 import os
 
-class Setup(commands.Cog):
+class SetupReportCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config_path = 'data/report/config.json'
@@ -29,4 +29,4 @@ class Setup(commands.Cog):
         await ctx.send(f'{channel.mention}が通報チャンネルとして設定されました。')
 
 async def setup(bot):
-    await bot.add_cog(Setup(bot))
+    await bot.add_cog(SetupReportCog(bot))

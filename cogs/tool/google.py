@@ -7,7 +7,7 @@ import requests
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 GOOGLE_CSE_ID = os.getenv('GOOGLE_CSE_ID')
 
-class GoogleSearch(commands.Cog):
+class GoogleSearchCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,4 +32,4 @@ class GoogleSearch(commands.Cog):
         await ctx.send(embed=embed)
 
 async def setup(bot):
-    await bot.add_cog(GoogleSearch(bot))
+    await bot.add_cog(GoogleSearchCog(bot))

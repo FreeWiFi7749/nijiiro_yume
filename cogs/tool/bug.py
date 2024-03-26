@@ -4,7 +4,7 @@ from discord.ext import commands
 main_dev_channel_id = 1221623526910459924
 main_dev_server_id = 825804625093328896
 
-class Bug(commands.Cog):
+class BugReportCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -29,4 +29,4 @@ class Bug(commands.Cog):
         await ctx.send("バグを報告しました。", ephemeral=True)
 
 async def setup(bot):
-    await bot.add_cog(Bug(bot))
+    await bot.add_cog(BugReportCog(bot))

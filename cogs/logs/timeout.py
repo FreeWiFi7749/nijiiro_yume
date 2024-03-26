@@ -4,7 +4,7 @@ import os
 import json
 import datetime
 
-class TimeoutLogging(commands.Cog):
+class TimeoutLoggingCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -70,4 +70,4 @@ class TimeoutLogging(commands.Cog):
                 embed.set_footer(text=before.guild.name, icon_url=before.guild.icon.url)
 
 async def setup(bot):
-    await bot.add_cog(TimeoutLogging(bot))
+    await bot.add_cog(TimeoutLoggingCog(bot))

@@ -3,7 +3,7 @@ from discord.ext import commands
 import json
 import os
 
-class ChannelLogging(commands.Cog):
+class ChannelLoggingCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -152,4 +152,4 @@ class ChannelLogging(commands.Cog):
             pass
 
 async def setup(bot):
-    await bot.add_cog(ChannelLogging(bot))
+    await bot.add_cog(ChannelLoggingCog(bot))

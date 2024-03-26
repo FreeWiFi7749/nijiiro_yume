@@ -4,7 +4,7 @@ import subprocess
 import difflib
 from pathlib import Path
 import pathlib
-
+from utils import startup
 class ManagementCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -47,13 +47,26 @@ class ManagementCog(commands.Cog):
     @commands.hybrid_command(name='list_cogs', with_app_command=True)
     @commands.is_owner()
     async def list_cogs(self, ctx):
-        """現在ロードされているcogsをリスト表示します"""
-        embed = discord.Embed(title="ロードされているCogsのファイル名", color=discord.Color.blue())
-        loaded_cogs = self.bot.cogs
-        module_names = [cog_instance.__module__ for cog_instance in loaded_cogs.values()]
-        embed.add_field(name="", value='\n'.join(module_names), inline=False)
+        """現在ロードされているCogsをリスト表示します"""
+        embed = discord.Embed(title="ロードされているCogs", color=discord.Color.blue())
+        cog_names = [cog for cog in self.bot.cogs.keys()]
+        if cog_names:
+            embed.add_field(name="Cogs", value='\n'.join(cog_names), inline=False)
+        else:
+            embed.add_field(name="Cogs", value="ロードされているCogはありません。", inline=False)
+
+        if hasattr(self.bot, 'failed_cogs') and self.bot.failed_cogs:
+            failed_cogs_list = [f'{cog}: {error}' for cog, error in self.bot.failed_cogs.items()]
+            e_failed_cogs = discord.Embed(title="正常に読み込めなかったCogファイル一覧", color=discord.Color.red())
+            e_failed_cogs.add_field(name="Failed Cogs", value='\n'.join(failed_cogs_list), inline=False)
+        else:
+            e_failed_cogs = discord.Embed(title="正常に読み込めなかったCogファイル一覧", color=discord.Color.green())
+            e_failed_cogs.add_field(name="Failed Cogs", value="なし", inline=False)
+
         await ctx.send(embed=embed)
-        return
+        await ctx.send(embed=e_failed_cogs)
+
+
 
 async def setup(bot):
     await bot.add_cog(ManagementCog(bot))

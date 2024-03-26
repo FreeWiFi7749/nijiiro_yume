@@ -4,7 +4,7 @@ import os
 import json
 from pathlib import Path
 
-class ReportCommand(commands.Cog):
+class ReportCommandCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.base_report_path = '/data/report/dm_message'
@@ -53,4 +53,4 @@ class ReportCommand(commands.Cog):
         await self.send_reports(ctx, reason)
 
 async def setup(bot):
-    await bot.add_cog(ReportCommand(bot))
+    await bot.add_cog(ReportCommandCog(bot))
