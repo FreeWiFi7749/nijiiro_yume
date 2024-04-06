@@ -25,7 +25,7 @@ class ReplyCog(commands.Cog):
                 message = await channel.fetch_message(payload.message_id)
                 if message.author.bot:
                     return
-                await channel.create_thread(name=f"{message.author}へのリプライ", message=message)
+                await channel.create_thread(name="リプライ", message=message)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -34,6 +34,7 @@ class ReplyCog(commands.Cog):
         guild_id = str(message.guild.id)
         channel_id = str(message.channel.id)
         user_id = str(message.author.id)
+        self.set_user_config(guild_id, channel_id, "all", True)
         if self.is_enabled_for_channel(guild_id, channel_id) and self.is_user_enabled(guild_id, channel_id, user_id):
             await message.add_reaction('💬')
 
